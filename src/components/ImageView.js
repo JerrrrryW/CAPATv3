@@ -1,8 +1,9 @@
 // src/components/ImageWindow.js
 import React from 'react';
 import './ImageView.css';
+import ImageEditor from './ImageEditor';
 
-function CardWithImages({ images }) {
+function HistoryCard({ images }) {
   return (
     <div className="card">
       <div className="card-header">切片历史</div>
@@ -30,8 +31,11 @@ function ImageView() {
   ];
   return (
     <div className="image-window">
-      <h2>图像窗口</h2>
-      <CardWithImages images={images}/>
+      <div className='image-view'>
+        <h2>图像窗口</h2>
+        <ImageEditor />
+      </div>
+      <HistoryCard images={images}/>
     </div>
   );
 }

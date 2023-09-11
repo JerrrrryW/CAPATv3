@@ -1,33 +1,24 @@
 
 /* 在你的CSS文件中定义样式 */
 
-.card {
-    border: 1px solid #ccc;
-    border-radius: 10px;
-  }
-  
-  .card-header {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-  }
-  
-  .image-list {
-    overflow-x: auto;
-    padding: 10px;
-  }
-  
-  .scrollable-images {
-    display: flex;
-    overflow-x: scroll;
-    gap: 10px;
-  }
-  
-  .scrollable-images img {
-    max-width: 100px; /* 根据需要设置图像的最大宽度 */
-    /* border: 1px solid #ccc; */
-    border-radius: 10px;
-  }
+.image-view {
+  flex: 1;
+}
+
+.image-list {
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.scrollable-images {
+  display: flex;
+  overflow-x: scroll;
+  gap: 10px;
+}
+
+.scrollable-images img {
+  max-width: 100px; /* 根据需要设置图像的最大宽度 */
+  /* border: 1px solid #ccc; */
+  border-radius: 10px;
+}
   

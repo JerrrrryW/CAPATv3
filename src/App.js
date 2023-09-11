@@ -3,7 +3,7 @@ import React from 'react';
 import './App.css';
 import Toolbar from './components/Toolbar.js';
 import ImageView from './components/ImageView.js';
-import AlgorithmList from './components/AlgorithmList.js';
+import AlgorithmList from './components/ToolsView.js';
 
 function App() {
   return (

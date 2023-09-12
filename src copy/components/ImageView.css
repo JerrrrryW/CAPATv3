@@ -1,0 +1,30 @@
+
+/* 在你的CSS文件中定义样式 */
+
+.image-view {
+  flex: 1;
+  max-width: 100%; /* 不超过父容器的宽度 */
+  max-height: 100%;
+  overflow: hidden;
+  position: relative; /* 添加这一行以确保绝对定位元素相对于该容器定位 */
+  z-index: 2; /* 将图像容器置于较高的层级 */
+}
+
+.image-list {
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.scrollable-images {
+  max-height: 80vh;
+  display: flex;
+  overflow-x: scroll;
+  gap: 10px;
+}
+
+.scrollable-images img {
+  max-width: 100px; /* 根据需要设置图像的最大宽度 */
+  /* border: 1px solid #ccc; */
+  border-radius: 10px;
+}
+  

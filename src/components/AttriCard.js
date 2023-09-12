@@ -17,6 +17,10 @@ function AttriCard({ attris }) {
       <div className="card-body" style={
         {
           padding: '10px',
+          backgroundColor: '#f5f5f5',
+          borderRadius: '5px',
+          display: 'flex',
+          flexDirection: 'column',
         }
       }>
         {attris.map((attr) => (

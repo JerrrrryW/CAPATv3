@@ -21,12 +21,12 @@ function HistoryCard({ images }) {
 
 function ImageView() {
   const images = [
-    '/fragments/fragment1.png',
-    '/fragments/fragment1.png',
-    '/fragments/fragment1.png',
-    '/fragments/fragment1.png',
-    '/fragments/fragment1.png',
-    '/fragments/fragment1.png'
+    '/fragments/P330_1.png',
+    '/fragments/P330_2.png',
+    '/fragments/P330_3.png',
+    '/fragments/P330_4.png',
+    '/fragments/P330_5.png',
+    '/fragments/P330_6.jpeg',
     // 添加更多图像URL
   ];
   return (

@@ -46,3 +46,23 @@ padding: 10px;
 border-top-left-radius: 5;
 border-top-right-radius: 5;
 }
+
+button {
+  background-color: #eee;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+button.active {
+  background-color: chocolate;
+  color: white;
+}
+
+button:hover {
+  background-color: chocolate;
+  color: white;
+  font-weight: bold;
+}

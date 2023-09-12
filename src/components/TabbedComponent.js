@@ -3,8 +3,8 @@ import './TabbedComponent.css';
 import AlgorithmView from './AlgorithmView';
 
 function TabbedComponent() {
-  const [activeTab, setActiveTab] = useState(0);
-  const algorithmList = ['SIFT', 'SURF', 'ORB', 'AKAZE', 'BRISK', 'KAZE'];
+  const [activeTab, setActiveTab] = useState(1);
+  const algorithmList = ['SIFT','HOG','Sobel','Scarr','Gradient','K-means', 'Color Hist'];
 
   const handleTabClick = (index) => {
     setActiveTab(index);

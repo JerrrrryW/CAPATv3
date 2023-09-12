@@ -67,16 +67,15 @@ function AlgorithmView({ inputArray }) {
           </button>
         ))}
       </div>
-# 
       {/* 中部图片处理结果预览区域 */}
       <div style={{ marginTop: '20px' , display: 'grid', placeItems: 'center', height: '300px'}}>
         {/* 添加图片处理结果预览区域的内容 */}
         <img
-              id = "captchaImg"
-			  src = ''
-			  alt = '点击刷新'
-			  style = {{ cursor:'pointer'}}
-			  onClick={getData}
+          id = "captchaImg"
+          src = './fragments/IMG_4242.jpeg'
+          alt = '点击刷新'
+          style = {{ cursor:'pointer', width: '450px', height: '300px', borderRadius: '5px'}}
+          onClick={getData}
 			  />
       </div>
 

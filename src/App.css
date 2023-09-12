@@ -6,7 +6,7 @@
 }
 
 .toolbar {
-  background-color: #333;
+  background-color: chocolate;
   color: white;
   padding: 10px;
   text-align: center;
@@ -19,7 +19,7 @@
 
 .image-window {
   flex: 2; /* 占据窗口宽度的2/3 */
-  background-color: #eee;
+  background-color: #f2ece5;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -28,21 +28,21 @@
 
 .algorithm-list {
   flex: 1; /* 占据窗口宽度的1/3 */
-  background-color: #ddd;
+  background-color: #d7cfc5;
   padding: 10px;
 }
 
 .card {
   margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  border: 1px solid chocolate;
+  border-radius: 5px;
   clear:both;
 }
 
 .card-header {
-background-color: #333;
+background-color: chocolate;
 color: white;
 padding: 10px;
-border-top-left-radius: 10px;
-border-top-right-radius: 10px;
+border-top-left-radius: 5;
+border-top-right-radius: 5;
 }

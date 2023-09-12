@@ -8,10 +8,12 @@
     border: none;
     padding: 10px 20px;
     cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
   }
   
   .tabs button.active {
-    background-color: #007bff;
+    background-color: chocolate;
     color: white;
   }
   

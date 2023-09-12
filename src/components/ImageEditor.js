@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ImageCrop from './ImageCrop'; // 根据文件路径调整
 
 class ImageEditor extends Component {
   constructor(props) {
@@ -8,7 +9,6 @@ class ImageEditor extends Component {
       zoom: 1,
       offsetX: 0,
       offsetY: 0,
-      doubleClickZoom: 2,
     };
     this.imageRef = React.createRef();
   }
@@ -19,34 +19,49 @@ class ImageEditor extends Component {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.setState({ imageSrc: e.target.result });
+        console.log(this.imageSrc)
       };
       reader.readAsDataURL(file);
+      this.handleUploadImg(file);
     }
+
   };
 
-  handleDoubleClick = () => {
-    const { zoom, doubleClickZoom } = this.state;
-  
-    // 如果当前缩放级别小于双击放大级别，则进行放大，否则恢复原始缩放级别
-    const newZoom = zoom < doubleClickZoom ? doubleClickZoom : 1;
-  
-    this.setState({ zoom: newZoom });
+  handleUploadImg = (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch('http://127.0.0.1:5000/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // 处理来自Flask后端的响应
+      })
+      .catch(error => {
+        console.error(error);
+      });
+
   };
 
   handleImageLoad = () => {
     const { naturalWidth, naturalHeight } = this.imageRef.current;
-    const { clientWidth, clientHeight } = this.imageContainer;
+    const { clientHeight } = this.imageContainer;
+    console.log(clientHeight);
+    // Calculate the aspect ratio of the image
+    const aspectRatio = naturalWidth / naturalHeight;
   
-    // Calculate initial zoom to fit the image's height inside the container
-    const initialZoom = clientHeight / naturalHeight;
+    // Calculate the new width and height to fit the container while preserving the aspect ratio
+    const newHeight = clientHeight;
+    const newWidth = newHeight * aspectRatio;//clientWidth;
   
+    // Set the state to update the image dimensions
     this.setState({
-      zoom: initialZoom,
-      offsetX: 0,
-      offsetY: 0,
+      imageWidth: newWidth,
+      imageHeight: newHeight,
     });
-  };
-  
+  };  
 
   handleZoom = (event) => {
     const { zoom } = this.state;
@@ -84,12 +99,23 @@ class ImageEditor extends Component {
       this.startY = clientY;
     }
   };
+  // const [crop, setCrop] = useState({ x: 0, y: 0 });
+  // const [zoom, setZoom] = useState(1);
+
+  // onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+  //   console.log(croppedArea, croppedAreaPixels);
+  // }, []);
 
   render() {
     const { imageSrc, zoom, offsetX, offsetY , imageWidth, imageHeight} = this.state;
-
+    // console.log(imageSrc)
     return (
-      <div>
+      <div
+      style={{
+        maxWidth: '100%',
+        maxHeight:'100%',
+        overflow: 'hidden',
+      }}>
         <input type="file" accept="image/*" onChange={this.handleImageChange} />
         <div
           ref={(ref) => (this.imageContainer = ref)}
@@ -98,27 +124,23 @@ class ImageEditor extends Component {
           onMouseUp={this.handleDragEnd}
           onMouseLeave={this.handleDragEnd}
           onMouseMove={this.handleDrag}
-          onDoubleClick={this.handleDoubleClick}
           style={{
-            width: '100%',
-            height: '100%',
+            maxWidth: '100%',
+            maxHeight: '100%',
             overflow: 'hidden',
             position: 'relative',
           }}
         >
           {imageSrc && (
-            <img
-              ref={this.imageRef}
-              src={imageSrc}
-              onLoad={this.handleImageLoad}
-              alt="Selected"
-              style={{
-                width: imageWidth,
-                height: imageHeight,
-                transform: `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`,
-                transition: 'transform 0.2s ease-in-out',
-              }}
-            />
+             <ImageCrop
+             imageSrc={imageSrc}
+             zoom={zoom}
+             offsetX={offsetX}
+             offsetY={offsetY}
+             imageWidth={imageWidth}
+             imageHeight={imageHeight}
+             onImageLoad={this.handleImageLoad}
+           />
           )}
         </div>
       </div>
@@ -127,3 +149,4 @@ class ImageEditor extends Component {
 }
 
 export default ImageEditor;
+

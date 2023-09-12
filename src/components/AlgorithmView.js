@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AttriCard from './AttriCard';
-
+import axios from 'axios';
 function AlgorithmView({ inputArray }) {
   const [buttonColumns, setButtonColumns] = useState(3); // 初始按钮列数为3
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -9,6 +9,28 @@ function AlgorithmView({ inputArray }) {
     { name: "参数2", min: 0, max: 50 },
     // 添加更多参数
   ];
+  const getData = async() => {
+    await axios.request("http://127.0.0.1:5000/getImg/",{
+		method:'get',
+		responseType:'blob'
+	  }).then((res)=>{
+		let blob = new Blob([res.data], {type: "img/png"});
+		let url = window.URL.createObjectURL(blob);
+		let captchaImg = document.getElementById('captchaImg')
+		if(captchaImg){
+		  	// @ts-ignore
+			// console.log(url)
+		  	captchaImg.src = url
+		  	captchaImg.onload = function () {
+			URL.revokeObjectURL(url)
+		  }
+		}
+		console.log(url)
+		console.log(res)
+	  }).catch (err=>{
+		console.log(err)
+	  })
+};
 
   const handleResize = () => {
     setWindowWidth(window.innerWidth);
@@ -45,11 +67,17 @@ function AlgorithmView({ inputArray }) {
           </button>
         ))}
       </div>
-
+# 
       {/* 中部图片处理结果预览区域 */}
       <div style={{ marginTop: '20px' , display: 'grid', placeItems: 'center', height: '300px'}}>
         {/* 添加图片处理结果预览区域的内容 */}
-        <img src='/logo192.png' alt="Processed Image" />
+        <img
+              id = "captchaImg"
+			  src = ''
+			  alt = '点击刷新'
+			  style = {{ cursor:'pointer'}}
+			  onClick={getData}
+			  />
       </div>
 
       {/* 下方参数调整窗口卡片 */}

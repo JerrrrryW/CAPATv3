@@ -5,7 +5,7 @@ import ImageEditor from './ImageEditor';
 
 function HistoryCard({ images }) {
   return (
-    <div className="card">
+    <div className="card" >
       <div className="card-header">切片历史</div>
       <div className="image-list">
         <div className="scrollable-images">
@@ -34,6 +34,7 @@ function ImageView() {
       <div className='image-view'>
         <h2>图像窗口</h2>
         <ImageEditor />
+
       </div>
       <HistoryCard images={images}/>
     </div>

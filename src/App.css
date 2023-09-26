@@ -5,19 +5,12 @@
   height: 100vh;
 }
 
-.toolbar {
-  background-color: chocolate;
-  color: white;
-  padding: 10px;
-  text-align: center;
-}
-
 .main-content {
   display: flex;
   flex: 1;
 }
 
-.image-window {
+.left-panel {
   flex: 2; /* 占据窗口宽度的2/3 */
   background-color: #f2ece5;
   padding: 10px;
@@ -66,3 +59,25 @@ button:hover {
   color: white;
   font-weight: bold;
 }
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.image-view {
+  flex: 1;
+  max-width: 100%; /* 不超过父容器的宽度 */
+  max-height: 100%;
+  overflow: hidden;
+  position: relative; /* 添加这一行以确保绝对定位元素相对于该容器定位 */
+  z-index: 2; /* 将图像容器置于较高的层级 */
+}
+
+
+#image-container {
+  flex:1;
+  max-height: 70vh;
+}
+
+  

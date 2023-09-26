@@ -1,0 +1,22 @@
+.toolbar {
+    background-color: chocolate;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    display:flex;
+
+    #toolbar-left {
+        flex:1;
+      text-align: left;
+    }
+    #toolbar-right {
+        flex:1;
+      text-align: right;
+    }
+    #toolbar-center {
+        flex:1;
+      text-align: center;
+      font-weight: bold;
+      font-size: 20px;
+    }
+}

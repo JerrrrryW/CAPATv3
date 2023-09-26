@@ -2,12 +2,10 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-
+from pywt import idwt
 from HOG import *
 from sklearn.cluster import KMeans
 from PIL import Image
-from PyQt5.QtGui import QPixmap
-from pywt import dwt2, idwt2
 from matplotlib import font_manager
 class features:
 
@@ -48,7 +46,9 @@ class features:
 
         # Convert the image to uint8
         sharp = sharp.astype("uint8")
-
+        cv.imshow('img',moon_f)
+        cv.imshow('sobel x',gx)
+        cv.imshow('sobel y', gy)
         cv.imshow('gradient', gradient)
         cv.imshow('sharp', sharp)
         cv.waitKey(0)
@@ -97,15 +97,20 @@ class features:
         self.scharrx = cv.convertScaleAbs(cv.Scharr(self.img,cv.CV_64F,1,0))
         self.scharry = cv.convertScaleAbs(cv.Scharr(self.img,cv.CV_64F,0,1))
         self.scharrs = cv.addWeighted(self.scharrx, 0.5, self.scharry, 0.5, 0)
-        plt.subplot(2,2,1),plt.imshow(self.img)
-        plt.title('Original'), plt.xticks([]), plt.yticks([])
-        plt.subplot(2,2,2),plt.imshow(self.scharrx)
-        plt.title('Scharr X'), plt.xticks([]), plt.yticks([])
-        plt.subplot(2,2,3),plt.imshow(self.scharry)
-        plt.title('Scharr Y'), plt.xticks([]), plt.yticks([])
-        plt.subplot(2,2,4),plt.imshow(self.scharrs)
-        plt.title('scharr s'), plt.xticks([]), plt.yticks([])
-        plt.show()
+        cv.imshow('img', self.img)
+        cv.imshow('scharr x', self.scharrx)
+        cv.imshow('scharr y', self.scharry)
+        cv.imshow('scharr s', self.scharrs)
+        cv.waitKey(0)
+        # plt.subplot(2,2,1),plt.imshow(self.img)
+        # plt.title('Original'), plt.xticks([]), plt.yticks([])
+        # plt.subplot(2,2,2),plt.imshow(self.scharrx)
+        # plt.title('Scharr X'), plt.xticks([]), plt.yticks([])
+        # plt.subplot(2,2,3),plt.imshow(self.scharry)
+        # plt.title('Scharr Y'), plt.xticks([]), plt.yticks([])
+        # plt.subplot(2,2,4),plt.imshow(self.scharrs)
+        # plt.title('scharr s'), plt.xticks([]), plt.yticks([])
+        # plt.show()
     
     #laplas
     def getLaplas(self):
@@ -115,8 +120,8 @@ class features:
     # 
     def getSIFT(self):
         sift = cv.xfeatures2d.SIFT_create(nfeatures=1000)
-        img1 = cv.imread("./processing/feature/0.png")
-        img2 = cv.imread("./processing/feature/true.png")
+        img1 = cv.imread("./test/P74.jpg")
+        img2 = cv.imread("./test/P74.jpg")
         img3=img2
         #img3=cv.flip(img2,-1)
         #求中心点，对图像进行旋转
@@ -215,6 +220,11 @@ class features:
 
         # fontnamelist = font_manager.get_font_names()
         # print(fontnamelist)
+        cv.imshow('低频分量',a)
+        cv.imshow('水平方向高频分量',b)
+        cv.imshow('垂直平方向高频分量',c)
+        cv.imshow('对角线方向高频分量',d)
+        cv.waitKey(0)
         plt.rcParams['font.sans-serif'] = ['Heiti Tc']
         #plt.subplot(231), plt.imshow(img, 'gray'), plt.title('原始图像'), plt.axis('off')
         plt.subplot(221), plt.imshow(a, 'gray'), plt.title('低频分量'), plt.axis('off')
@@ -314,4 +324,4 @@ class features:
 if __name__ == "__main__":
     f = features()
     f.getImg()
-    f.getSIFT()
+    f.DWT()

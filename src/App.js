@@ -1,10 +1,10 @@
 // src/App.js
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import './components/HistoryCard.css';
 import Toolbar from './components/Toolbar.js';
-import AlgorithmList from './components/ToolsView.js';
 import ImageCropper from './components/ImageCropper.js';
+import TabbedComponent from './components/TabbedComponent.js';
 
 function HistoryCard({ images }) {
   return (
@@ -37,7 +37,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <Toolbar 
+      <Toolbar
         setImageSrc={setImageSrc}
       />
       <div className="main-content">
@@ -51,7 +51,9 @@ function App() {
           </div>
         </div>
         {/* <ImageCropper /> */}
-        <AlgorithmList />
+        <div className="right-panel">
+          <TabbedComponent />
+        </div>
       </div>
     </div>
   );

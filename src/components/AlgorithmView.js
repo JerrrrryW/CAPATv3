@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import AttriCard from './AttriCard';
+import './AlgorithmView.css';
 import axios from 'axios';
-function AlgorithmView({ inputArray }) {
+function AlgorithmView({ 
+  inputArray ,
+  imgSrc,
+}) {
   const [buttonColumns, setButtonColumns] = useState(3); // 初始按钮列数为3
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
   const attris = [
     { name: "参数1", min: 0, max: 100 },
     { name: "参数2", min: 0, max: 50 },
     // 添加更多参数
   ];
   const getData = async() => {
-    await axios.request("http://127.0.0.1:5000/getImg/",{
+    await axios.request("http://127.0.0.1:5000/getImgProceed/",{
 		method:'get',
 		responseType:'blob'
 	  }).then((res)=>{
@@ -55,9 +60,9 @@ function AlgorithmView({ inputArray }) {
   }, [windowWidth, inputArray.length]);
 
   return (
-    <div>
+    <div className='algorithm-container'>
       {/* 上方算法按钮列表 */}
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+      <div className='algorithm-buttons'>
         {inputArray.map((item, index) => (
           <button
             key={index}
@@ -68,19 +73,18 @@ function AlgorithmView({ inputArray }) {
         ))}
       </div>
       {/* 中部图片处理结果预览区域 */}
-      <div style={{ marginTop: '20px' , display: 'grid', placeItems: 'center', height: '300px'}}>
+      <div className='image-preview'>
         {/* 添加图片处理结果预览区域的内容 */}
         <img
           id = "captchaImg"
-          src = './fragments/IMG_4242.jpeg'
+          src = {imgSrc}
           alt = '点击刷新'
-          style = {{ cursor:'pointer', width: '450px', height: '300px', borderRadius: '5px'}}
           onClick={getData}
 			  />
       </div>
 
       {/* 下方参数调整窗口卡片 */}
-      <div style={{ marginTop: '20px' }}>
+      <div className='attri-card'>
         <AttriCard attris={attris} />
       </div>
     </div>

@@ -1,0 +1,36 @@
+.algorithm-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 上方算法按钮列表 */
+.algorithm-buttons {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.algorithm-buttons button {
+    flex: 1;
+    flex-basis: calc(33.33% - 10px);
+    margin: 5px;
+}
+
+/* 中部图片处理结果预览区域 */
+.image-preview {
+    margin-top: 20px;
+    display: grid;
+    place-items: center;
+    flex: 1;
+}
+
+.image-preview img {
+    cursor: pointer;
+    max-height: 65vh;
+    border-radius: 5px;
+}
+
+/* 下方参数调整窗口卡片 */
+.attri-card {
+    margin-top: 20px;
+    align-items: flex-end;
+}

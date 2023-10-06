@@ -31,7 +31,10 @@ function TabbedComponent() {
         {activeTab === 1 && 
             <div>
                 <p>图像处理算法</p>
-                <AlgorithmView inputArray={algorithmList} />
+                <AlgorithmView 
+                  inputArray={algorithmList}
+                  imgSrc={'./P330.jpg'}
+                />
             </div>
         }
       </div>

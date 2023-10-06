@@ -19,7 +19,7 @@
   max-width: 70%;
 }
 
-.algorithm-list {
+.right-panel {
   flex: 1; /* 占据窗口宽度的1/3 */
   background-color: #d7cfc5;
   padding: 10px;
@@ -74,10 +74,14 @@ img {
   z-index: 2; /* 将图像容器置于较高的层级 */
 }
 
-
 #image-container {
   flex:1;
   max-height: 70vh;
+}
+
+#history-container {
+  overflow-y: scroll;
+  align-items: flex-end;
 }
 
   

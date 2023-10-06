@@ -86,6 +86,7 @@ export default function ({ file, parentHeight = 600 }) {
   const handleMouseDownEvent = e => {
     // 开始裁剪
     setDragging(true);
+    setTrimPositionMap([]);
     const { offsetX, offsetY } = e.nativeEvent;
     // 保存开始坐标
     setStartCoordinate([offsetX, offsetY]);
@@ -131,6 +132,8 @@ export default function ({ file, parentHeight = 600 }) {
     btnGroupNode.style.left = `${curPoisition.startX}px`;
     btnGroupNode.style.top = `${curPoisition.startY + curPoisition.height}px`;
 
+    setTrimPositionMap([curPoisition]);
+
     // 判断裁剪区是否重叠(此项目需要裁剪不规则的相邻区域，所以裁剪框重叠时才支持批量裁剪)
     // judgeTrimAreaIsOverlap();
   };
@@ -140,8 +143,9 @@ export default function ({ file, parentHeight = 600 }) {
   }, [canvasNode, url]);
 
   // 获得裁剪后的图片文件
-  const getImgTrimData = flag => {
+  const getImgTrimData = () => {
     // trimPositionMap为裁剪框的坐标数据
+    console.log(trimPositionMap);
     if (trimPositionMap.length === 0) {
       return;
     }
@@ -158,9 +162,12 @@ export default function ({ file, parentHeight = 600 }) {
     trimPositionMap.map(pos => {
       // 取到裁剪框的像素数据
       const data = ctx.getImageData(pos.startX, pos.startY, pos.width, pos.height);
+      // console.log("cutted data:", data);
       // 输出在canvas上
       return trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
     });
+
+    contentNode.appendChild(trimCanvasNode);
 
     // const trimData = trimCanvasNode.toDataURL();
 
@@ -285,11 +292,11 @@ export default function ({ file, parentHeight = 600 }) {
           size="small"
           ghost
           // disabled={fileSyncUpdating}
-          onClick={() => getImgTrimData('justImg')}
+          onClick={getImgTrimData}
         >
           转为图片
         </button>
-        <button
+        {/* <button
           type="link"
           icon="file-text"
           size="small"
@@ -298,7 +305,7 @@ export default function ({ file, parentHeight = 600 }) {
           onClick={getImgTrimData}
         >
           转为文字
-        </button>
+        </button> */}
       </div>
     </section>
   )

@@ -8,6 +8,7 @@ function AlgorithmView({
 }) {
   const [buttonColumns, setButtonColumns] = useState(3); // 初始按钮列数为3
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [highlightedButtonIndex, setHighlightedButtonIndex] = useState(null);
 
   const attris = [
     { name: "参数1", min: 0, max: 100 },
@@ -41,6 +42,10 @@ function AlgorithmView({
     setWindowWidth(window.innerWidth);
   };
 
+  const handleButtonClick = (index) => {
+    setHighlightedButtonIndex(index);
+  };
+
   useEffect(() => {
     window.addEventListener('resize', handleResize);
     return () => {
@@ -66,7 +71,13 @@ function AlgorithmView({
         {inputArray.map((item, index) => (
           <button
             key={index}
-            style={{ flexBasis: `calc(${100 / buttonColumns}% - 10px)`, margin: '5px' }}
+            className={highlightedButtonIndex === index ? 'active' : ''}
+            style={{
+              flexBasis: `calc(${100 / buttonColumns}% - 10px)`,
+              margin: '5px',
+              // backgroundColor: highlightedButtonIndex === index ? 'yellow' : 'initial',
+            }}
+            onClick={() => handleButtonClick(index)}
           >
             {item}
           </button>

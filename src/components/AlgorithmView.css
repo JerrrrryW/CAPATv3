@@ -25,8 +25,12 @@
 
 .image-preview img {
     cursor: pointer;
-    max-height: 65vh;
     border-radius: 5px;
+}
+
+#captchaImg {
+    max-width: 100%;
+    max-height: 52vh;
 }
 
 /* 下方参数调整窗口卡片 */

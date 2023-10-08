@@ -30,11 +30,11 @@ function AttriCard({ attris }) {
               type="range"
               min={attr.min}
               max={attr.max}
-              value={parameterValues[attr.name] || attr.min}
+              value={parameterValues[attr.name] || attr.value}
               onChange={handleSliderChange(attr.name)}
               id={attr.name}
             />
-            <span>{parameterValues[attr.name] || attr.min}</span>
+            <span>{parameterValues[attr.name] || attr.value}</span>
           </div>
         ))}
       </div>

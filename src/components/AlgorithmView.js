@@ -11,8 +11,8 @@ function AlgorithmView({
   const [highlightedButtonIndex, setHighlightedButtonIndex] = useState(null);
 
   const attris = [
-    { name: "参数1", min: 0, max: 100 },
-    { name: "参数2", min: 0, max: 50 },
+    { name: "参数1", min: 0, max: 100 , value: 50},
+    { name: "参数2", min: 0, max: 50 , value: 25},
     // 添加更多参数
   ];
   const getData = async() => {
@@ -44,6 +44,7 @@ function AlgorithmView({
 
   const handleButtonClick = (index) => {
     setHighlightedButtonIndex(index);
+    //TODO 
   };
 
   useEffect(() => {

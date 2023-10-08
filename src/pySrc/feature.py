@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-from .HOG import *
+from HOG import *
 from sklearn.cluster import KMeans
 from PIL import Image
 from PyQt5.QtGui import QPixmap
@@ -15,8 +15,8 @@ import re
 class features:
 
     def __init__(self):
-        self.filePath = './public/fragments/fragment0.png'
-        self.savePath = './public/fragments/proceed0.png'
+        self.filePath = 'public/fragments/fragment0.png'
+        self.savePath = 'public/fragments/proceed0.png'
         self.img = []
         self.HOG = []
         self.sobelx = []
@@ -68,12 +68,6 @@ class features:
         gs = cv.addWeighted(gx, 0.5, gy, 0.5, 0)
         gradient = cv.convertScaleAbs(gx) + cv.convertScaleAbs(gy)
 
-        # Apply the gradient to the image
-        sharp = cv.addWeighted(moon_f, 1, gradient, alpha, 0)
-        sharp = np.where(sharp < 0, 0, np.where(sharp > 255, 255, sharp))
-
-        # Convert the image to uint8
-        sharp = sharp.astype("uint8")
         # plt.subplot(2,2,1),plt.imshow(self.img)
         # plt.title('Original'), plt.xticks([]), plt.yticks([])
         # plt.subplot(2,2,2),plt.imshow(gx)
@@ -83,17 +77,10 @@ class features:
         # plt.subplot(2,2,4),plt.imshow(gs)
         # plt.title('Sobel s'), plt.xticks([]), plt.yticks([])
         # plt.show()
-        savePath = self.getSavePath('sharp')
         cv.imwrite('0.jpg', gs)
-        print(savePath)
         # cv.imshow('gradient', gradient)
         # cv.imshow('sharp', sharp)
         # cv.waitKey(0)
-        # Convert the image to QPixmap via QImage
-        height, width = sharp.shape
-        bytesPerLine = width
-        # qimage = QImage(sharp.data, width, height, bytesPerLine, QImage.Format_Grayscale8)
-        # qpixmap = QPixmap(qimage)
 
         # return qpixmap
 
@@ -111,6 +98,14 @@ class features:
         gy = cv.convertScaleAbs(cv.Sobel(moon_f, cv.CV_64F, 0, 1, ksize=3))
         gs = cv.addWeighted(gx, 0.5, gy, 0.5, 0)
         gradient = cv.convertScaleAbs(gx) + cv.convertScaleAbs(gy)
+
+        # Apply the gradient to the image
+        # sharp = cv.addWeighted(moon_f, 1, gradient, alpha, 0)
+        # sharp = np.where(sharp < 0, 0, np.where(sharp > 255, 255, sharp))
+
+        # # Convert the image to uint8
+        # sharp = sharp.astype("uint8")
+
         cv.imwrite('0.jpg', gradient)
     # 
     def erode(self, kernel_size_num=3, start_color=(255, 255, 255), end_color=(255, 0, 0),
@@ -159,6 +154,7 @@ class features:
         # plt.title('scharr s'), plt.xticks([]), plt.yticks([])
         # plt.show()
         cv.imwrite('0.jpg', self.scharrs)
+
     #laplas
     def getLaplas(self):
         self.laplas = cv.Laplacian(self.img, cv.CV_64F)
@@ -168,7 +164,7 @@ class features:
     def getSIFT(self):
         sift = cv.xfeatures2d.SIFT_create(nfeatures=1000)
         img1 = cv.imread(self.filePath)
-        img2 = cv.imread("./test/p330_6.jpeg")
+        img2 = cv.imread(self.filePath)
         img3=img2
         #img3=cv.flip(img2,-1)
         #求中心点，对图像进行旋转
@@ -232,7 +228,6 @@ class features:
         # cv.imwrite("SIFTimg1t.jpg",img1t)
         # cv.imwrite("SIFTimg3t.jpg",img3t)
         # cv.imwrite("SIFTResult.jpg",res)
-        cv.waitKey(0)
         #cv.destroyAllWindows()
 
 
@@ -338,16 +333,14 @@ class features:
         km = KMeans(n_clusters = 5)
         f = open(self.filePath, 'rb')
         data = []
-        img = Image.open(f)
+        img = Image.open(f).convert("RGB")
         m, n = img.size
         for i in range(m):
             for j in range(n):
                 x, y, z = img.getpixel((i, j))
                 data.append([x/256.0, y/256.0, z/256.0])
-        f.close()
         imgData = np.array(data)
         row, col = m, n
-
         #聚类获取每个像素所属的类别
         label = km.fit_predict(imgData)
         label = label.reshape([row, col])
@@ -361,7 +354,7 @@ class features:
                 pic_new.putpixel((i, j), int(256 / (label[i][j] + 1)))
         #pic_new = cv2.applyColorMap(cv2.convertScaleAbs(pic_new, alpha=-1), cv2.COLORMAP_JET)
         #以JPEG格式保存图片
-        pic_new.save("0.jpg","JPEG")
+        pic_new.save("0.jpg")
 
 
 def proceed():

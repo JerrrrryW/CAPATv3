@@ -5,7 +5,7 @@ import io
 import base64
 import os
 import re
-from pySrc.feature import features
+from feature import features
  
 def proceed():
     f = features()
@@ -42,7 +42,8 @@ def get_imgstream(img_local_path):
     img_stream = ''
     with open(img_local_path, 'rb') as img_f:
         img_stream = img_f.read()
-        # img_stream = base64.b64encode(img_stream).decode()
+        # print(img_stream)
+        img_stream = base64.b64encode(img_stream).decode()
     return img_stream
 
 app = Flask(__name__)
@@ -60,21 +61,29 @@ def getProceed():
         file_name = data.get('fileName')
         sname = '0.jpg'
         f = features()
-        f.filePath = './public/fragments/fragment.png'
+        f.filePath = 'public/fragments/fragment.png'
         f.getImg()
 
         if file_name == 'SIFT':
+            print('SIFT')
             f.getSIFT()
         elif file_name == 'HOG':
+            print('HOG')
             f.getHOG()
         elif file_name == 'Sobel':
-            f.strengthen()
-        elif file_name == 'scharr':
+            print('Sobel')
+            f.strengthen(10)
+            print('done')
+        elif file_name == 'Scarr':
+            print('scharr')
             f.getScharr()
         elif file_name =='Gradient':
+            print('Gradient')
             f.getGradient()
-        elif file_name == 'K-Means':
+        elif file_name == 'K-means':
+            print('K-Means')
             f.color_kmeans()
+            print('K-Means Done')
         elif file_name == 'Color-Hist':
             f.colorHist()
         

@@ -82,6 +82,23 @@ img {
 #history-container {
   overflow-y: scroll;
   align-items: flex-end;
+
 }
 
-  
+.image-list {
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.scrollable-images {
+  height: 12vh;
+  display: flex;
+  overflow-x: scroll;
+  gap: 10px;
+}
+
+.scrollable-images img {
+  max-width: 100px; /* 根据需要设置图像的最大宽度 */
+  /* border: 1px solid #ccc; */
+  border-radius: 10px;
+}

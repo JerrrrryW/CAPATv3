@@ -6,7 +6,11 @@ import React, { useState, useEffect } from 'react';
 *useOcr true:通过OCR转换成文字；false:转换为图片
 *onTransform 转换成文字或图片后调用组件外部方法
 */
-export default function ({ file, parentHeight = 600 }) {
+export default function ({ 
+  file, 
+  parentHeight = 600,
+  setHistoricalImages,
+}) {
   const { url } = file;
   const [originImg, setOriginImg] = useState(); // 源图片
   const [contentNode, setContentNode] = useState(); // 最外层节点
@@ -162,12 +166,16 @@ export default function ({ file, parentHeight = 600 }) {
     trimPositionMap.map(pos => {
       // 取到裁剪框的像素数据
       const data = ctx.getImageData(pos.startX, pos.startY, pos.width, pos.height);
-      // console.log("cutted data:", data);
       // 输出在canvas上
-      return trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
+      trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
+      const dataUrl = trimCanvasNode.toDataURL();
+      // 向父节点传递历史切片信息
+      setHistoricalImages(prevState => [...prevState, dataUrl]);
+      return null;
     });
 
-    contentNode.appendChild(trimCanvasNode);
+    // 将裁剪后的图片显示在页面上（仅供测试使用）
+    // contentNode.appendChild(trimCanvasNode);
 
     // const trimData = trimCanvasNode.toDataURL();
 

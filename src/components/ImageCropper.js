@@ -6,10 +6,11 @@ import React, { useState, useEffect, useRef } from 'react';
 *useOcr true:通过OCR转换成文字；false:转换为图片
 *onTransform 转换成文字或图片后调用组件外部方法
 */
-export default function ({ 
-  file, 
+export default function ({
+  file,
   parentHeight = 600,
   setHistoricalImages,
+  contentRef,
 }) {
   const { url } = file;
   const [originImg, setOriginImg] = useState(); // 源图片
@@ -23,6 +24,8 @@ export default function ({
   // const fileSyncUpdating = useSelector(state => state.loading.effects['digital/postImgFileWithAliOcr']);
   // const dispatch = useDispatch();
   const [zoomLevel, setZoomLevel] = useState(1.0);
+  const [imgOffset, setImgOffset] = useState([0, 0]);
+  const [imgScale, setImgScale] = useState([10, 10]);
 
 
   // 初始化
@@ -44,43 +47,72 @@ export default function ({
     setOriginImg(image); // 保存源图
     image.addEventListener('load', () => {
       const ctx = canvasNode.getContext('2d');
-      // 擦除一次，否则canvas会一层层叠加，节省内存
-      ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
+
       // 若源图宽度大于最外层节点的clientWidth，则设置canvas宽为clientWidth，否则设置为图片的宽度
-      const clientW = contentNode.clientWidth;
-      const size = image.width / clientW;
-      // 设置最大高度，比如500像素
-      const maxHeight = parentHeight;
+      // const clientW = contentNode.clientWidth;
+      // const size = image.width / clientW;
+      // // 设置最大高度，比如500像素
+      // const maxHeight = parentHeight;
 
-      let canvasWidth, canvasHeight;
+      // let canvasWidth, canvasHeight;
 
-      if (image.width > clientW) {
-        canvasWidth = clientW;
-        canvasHeight = image.height / size;
+      // if (image.width > clientW) {
+      //   canvasWidth = clientW;
+      //   canvasHeight = image.height / size;
 
-        // 如果高度超过最大高度，重新计算宽度和高度
-        if (canvasHeight > maxHeight) {
-          const ratio = maxHeight / canvasHeight;
-          canvasHeight = maxHeight;
-          canvasWidth *= ratio;
-        }
+      //   // 如果高度超过最大高度，重新计算宽度和高度
+      //   if (canvasHeight > maxHeight) {
+      //     const ratio = maxHeight / canvasHeight;
+      //     canvasHeight = maxHeight;
+      //     canvasWidth *= ratio;
+      //   }
+      // } else {
+      //   canvasWidth = image.width;
+      //   canvasHeight = image.height;
+
+      //   // 如果高度超过最大高度，重新计算宽度和高度
+      //   if (canvasHeight > maxHeight) {
+      //     const ratio = maxHeight / canvasHeight;
+      //     canvasHeight = maxHeight;
+      //     canvasWidth *= ratio;
+      //   }
+      // }
+
+      // canvasNode.width = canvasWidth;
+      // canvasNode.height = canvasHeight;
+
+      canvasNode.width = contentNode.clientWidth;
+      canvasNode.height = parentHeight;
+
+      // 计算图片放置在canvas中央时的位置
+      const canvasWidth = canvasNode.width;
+      const canvasHeight = canvasNode.height;
+      const imageWidth = image.width;
+      const imageHeight = image.height;
+      let imgX = 0;
+      let imgY = 0;
+
+      // 计算图片放置的位置，使其居中
+      if (imageWidth > imageHeight) {
+        // 图片宽度大于高度
+        const scaledHeight = (canvasWidth / imageWidth) * imageHeight;
+        imgY = (canvasHeight - scaledHeight) / 2;
       } else {
-        canvasWidth = image.width;
-        canvasHeight = image.height;
-
-        // 如果高度超过最大高度，重新计算宽度和高度
-        if (canvasHeight > maxHeight) {
-          const ratio = maxHeight / canvasHeight;
-          canvasHeight = maxHeight;
-          canvasWidth *= ratio;
-        }
+        // 图片高度大于宽度
+        const scaledWidth = (canvasHeight / imageHeight) * imageWidth;
+        imgX = (canvasWidth - scaledWidth) / 2;
       }
 
-      canvasNode.width = canvasWidth;
-      canvasNode.height = canvasHeight;
+      // 清空canvas
+      ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
 
-      // 调用drawImage API将版面图绘制出来
-      ctx.drawImage(image, 0, 0, canvasNode.width, canvasNode.height);
+      // 绘制图片到canvas中央
+      const scaledX = canvasNode.width - 2 * imgX;
+      const scaledY = canvasNode.height - 2 * imgY;
+      ctx.drawImage(image, imgX, imgY, scaledX, scaledY);
+      setImgOffset([imgX, imgY]);
+      setImgScale([scaledX, scaledY]);
+
     });
     // image.crossOrigin = 'anonymous'; // 解决图片跨域问题
     image.src = url;
@@ -148,10 +180,10 @@ export default function ({
     event.preventDefault();
     const delta = event.deltaY;
     let newZoomLevel = zoomLevel + (delta > 0 ? -0.1 : 0.1);
-    
+
     // 限制缩放范围
     newZoomLevel = Math.max(0.1, Math.min(3.0, newZoomLevel));
-    
+
     setZoomLevel(newZoomLevel);
   };
 
@@ -171,18 +203,18 @@ export default function ({
   }, [canvasNode, url]);
 
   useEffect(() => {
-    
+
     if (canvasNode && originImg) {
       const ctx = canvasNode.getContext('2d');
       // 清除画布
       ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
-      
+
       // 缩放画布
       ctx.save();
       ctx.scale(zoomLevel, zoomLevel);
 
       // 绘制图像
-      ctx.drawImage(originImg, 0, 0, canvasNode.width, canvasNode.height);
+      ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
 
       ctx.restore();
     }
@@ -220,13 +252,13 @@ export default function ({
     trimCtx.clearRect(0, 0, trimCanvasNode.width, trimCanvasNode.height);
     trimPositionMap.map(pos => {
       // 取到裁剪框的像素数据
-      const data = ctx.getImageData(pos.startX+trimPadding, pos.startY+trimPadding, pos.width-2*trimPadding, pos.height-2*trimPadding);
+      const data = ctx.getImageData(pos.startX + trimPadding, pos.startY + trimPadding, pos.width - 2 * trimPadding, pos.height - 2 * trimPadding);
       // 输出在canvas上
       trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
-      ctx.clearRect(0,0,canvasNode.width,canvasNode.height);
+      ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
       setOriginImg(trimCanvasNode);
       // 刷新ctx
-      ctx.putImageData(data, pos.startX+trimPadding, pos.startY+trimPadding);
+      ctx.putImageData(data, pos.startX + trimPadding, pos.startY + trimPadding);
       const dataUrl = trimCanvasNode.toDataURL();
 
       // 向父节点传递历史切片信息
@@ -303,7 +335,7 @@ export default function ({
     // 再次调用drawImage将图片绘制到蒙层下方
     ctx.save();
     ctx.globalCompositeOperation = 'destination-over';
-    ctx.drawImage(originImg, 0, 0, canvasNode.width, canvasNode.height);
+    ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
     ctx.restore();
   };
 
@@ -362,7 +394,7 @@ export default function ({
         onMouseMove={handleMouseMoveEvent}
         onMouseUp={handleMouseRemoveEvent}
       />
-      
+
     </section>
   )
 }

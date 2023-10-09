@@ -26,6 +26,7 @@ export default function ({
   const [zoomLevel, setZoomLevel] = useState(1.0);
   const [imgOffset, setImgOffset] = useState([0, 0]);
   const [imgScale, setImgScale] = useState([10, 10]);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
 
   // 初始化
@@ -137,6 +138,8 @@ export default function ({
   // 移动鼠标事件
   const handleMouseMoveEvent = e => {
     if (!dragging) {
+      const { offsetX, offsetY } = e.nativeEvent;
+      setMousePosition({ x: offsetX, y: offsetY });
       return;
     }
     const ctx = canvasNode.getContext('2d');
@@ -144,6 +147,7 @@ export default function ({
     ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
 
     const { offsetX, offsetY } = e.nativeEvent;
+    setMousePosition({ x: offsetX, y: offsetY });
 
     // 计算临时裁剪框的宽高
     const tempWidth = offsetX - startCoordinate[0];
@@ -169,6 +173,8 @@ export default function ({
     btnGroupNode.style.top = `${curPoisition.startY + curPoisition.height}px`;
 
     setTrimPositionMap([curPoisition]);
+    console.log(curPoisition);
+    console.log(imgOffset)
 
     // 判断裁剪区是否重叠(此项目需要裁剪不规则的相邻区域，所以裁剪框重叠时才支持批量裁剪)
     // judgeTrimAreaIsOverlap();
@@ -208,21 +214,31 @@ export default function ({
       const ctx = canvasNode.getContext('2d');
       // 清除画布
       ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
-
-      // 缩放画布
+  
+      // 计算鼠标相对于canvas的位置
+      const canvasRect = canvasNode.getBoundingClientRect();
+      const mouseX = mousePosition.x - canvasRect.left;
+      const mouseY = mousePosition.y - canvasRect.top;
+  
+      // 缩放画布以鼠标位置为中心
       ctx.save();
+      ctx.translate(mouseX, mouseY);
       ctx.scale(zoomLevel, zoomLevel);
-
+      ctx.translate(-mouseX, -mouseY);
+  
       // 绘制图像
       ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
-
+      console.log(imgOffset)
+      console.log(imgScale)
+  
       ctx.restore();
     }
+  
     // 添加滚动事件监听
     if (canvasNode) {
       canvasNode.addEventListener('wheel', handleScroll);
     }
-
+  
     return () => {
       // 移除滚动事件监听
       if (canvasNode) {
@@ -252,7 +268,8 @@ export default function ({
     trimCtx.clearRect(0, 0, trimCanvasNode.width, trimCanvasNode.height);
     trimPositionMap.map(pos => {
       // 取到裁剪框的像素数据
-      const data = ctx.getImageData(pos.startX + trimPadding, pos.startY + trimPadding, pos.width - 2 * trimPadding, pos.height - 2 * trimPadding);
+      console.log("trim pos:", pos);
+      const data = ctx.getImageData(pos.startX + trimPadding, pos.startY + trimPadding , pos.width - 2 * trimPadding, pos.height - 2 * trimPadding );
       // 输出在canvas上
       trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
       ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
@@ -270,7 +287,6 @@ export default function ({
     // contentNode.appendChild(trimCanvasNode);
 
     // const trimData = trimCanvasNode.toDataURL();
-
   };
 
   // 计算出包含多个裁剪框的最小矩形

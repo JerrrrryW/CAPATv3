@@ -24,7 +24,12 @@ function AttriCard({ attris }) {
         }
       }>
         {attris.map((attr) => (
-          <div key={attr.name}>
+          <div key={attr.name}
+            style={{
+              display: 'flex',
+              marginBottom: '10px',
+            }}
+          >
             <label htmlFor={attr.name}>{attr.name}</label>
             <input
               type="range"
@@ -33,6 +38,11 @@ function AttriCard({ attris }) {
               value={parameterValues[attr.name] || attr.value}
               onChange={handleSliderChange(attr.name)}
               id={attr.name}
+              style={{
+                marginLeft: '10px',
+                marginRight: '10px',
+                
+              }}
             />
             <span>{parameterValues[attr.name] || attr.value}</span>
           </div>

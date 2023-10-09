@@ -137,17 +137,15 @@ export default function ({
 
   // 移动鼠标事件
   const handleMouseMoveEvent = e => {
+    const { offsetX, offsetY } = e.nativeEvent;
+    setMousePosition({ x: offsetX, y: offsetY });
+
     if (!dragging) {
-      const { offsetX, offsetY } = e.nativeEvent;
-      setMousePosition({ x: offsetX, y: offsetY });
       return;
     }
     const ctx = canvasNode.getContext('2d');
     // 每一帧都需要清除画布(取最后一帧绘图状态, 否则状态会累加)
     ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
-
-    const { offsetX, offsetY } = e.nativeEvent;
-    setMousePosition({ x: offsetX, y: offsetY });
 
     // 计算临时裁剪框的宽高
     const tempWidth = offsetX - startCoordinate[0];
@@ -228,8 +226,7 @@ export default function ({
   
       // 绘制图像
       ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
-      console.log(imgOffset)
-      console.log(imgScale)
+      console.log("scrolling:",imgOffset, imgScale)
   
       ctx.restore();
     }
@@ -251,7 +248,7 @@ export default function ({
   // 获得裁剪后的图片文件
   const getImgTrimData = () => {
     // trimPositionMap为裁剪框的坐标数据
-    console.log(trimPositionMap);
+    // console.log(trimPositionMap);
     if (trimPositionMap.length === 0) {
       return;
     }
@@ -268,7 +265,7 @@ export default function ({
     trimCtx.clearRect(0, 0, trimCanvasNode.width, trimCanvasNode.height);
     trimPositionMap.map(pos => {
       // 取到裁剪框的像素数据
-      console.log("trim pos:", pos);
+      // console.log("trim pos:", pos);
       const data = ctx.getImageData(pos.startX + trimPadding, pos.startY + trimPadding , pos.width - 2 * trimPadding, pos.height - 2 * trimPadding );
       // 输出在canvas上
       trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
@@ -351,6 +348,7 @@ export default function ({
     // 再次调用drawImage将图片绘制到蒙层下方
     ctx.save();
     ctx.globalCompositeOperation = 'destination-over';
+    console.log("dragging:", imgOffset, imgScale)
     ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
     ctx.restore();
   };

@@ -65,6 +65,10 @@ img {
   max-height: 100%;
 }
 
+canvas {
+  margin-top: 10px;
+}
+
 .image-view {
   flex: 1;
   max-width: 100%; /* 不超过父容器的宽度 */
@@ -76,7 +80,7 @@ img {
 
 #image-container {
   flex:1;
-  max-height: 70vh;
+  max-height: 72vh;
 }
 
 #history-container {

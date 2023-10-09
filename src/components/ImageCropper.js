@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import HttpUtil from '../utils/HttpUtil';
+import React, { useState, useEffect, useRef } from 'react';
 // import { useSelector, useDispatch } from 'react-redux';
 
 /**
@@ -23,7 +23,7 @@ export default function ({
   const [trimPositionMap, setTrimPositionMap] = useState([]); // 裁剪框坐标信息
   // const fileSyncUpdating = useSelector(state => state.loading.effects['digital/postImgFileWithAliOcr']);
   // const dispatch = useDispatch();
-
+  const [zoomLevel, setZoomLevel] = useState(1.0);
 
 
   // 初始化
@@ -100,7 +100,7 @@ export default function ({
       return;
     }
     // 裁剪按钮不可见
-    btnGroupNode.style.display = 'none';
+    // btnGroupNode.style.display = 'none';
   };
 
   // 移动鼠标事件
@@ -143,9 +143,63 @@ export default function ({
     // judgeTrimAreaIsOverlap();
   };
 
+  // 设置鼠标滚动事件
+  // 监听滚动事件
+  const handleScroll = (event) => {
+    event.preventDefault();
+    const delta = event.deltaY;
+    let newZoomLevel = zoomLevel + (delta > 0 ? -0.1 : 0.1);
+    
+    // 限制缩放范围
+    newZoomLevel = Math.max(0.1, Math.min(3.0, newZoomLevel));
+    
+    setZoomLevel(newZoomLevel);
+  };
+
   useEffect(() => {
     initCanvas();
+    // 添加滚动事件监听
+    if (canvasNode) {
+      canvasNode.addEventListener('wheel', handleScroll);
+    }
+
+    return () => {
+      // 移除滚动事件监听
+      if (canvasNode) {
+        canvasNode.removeEventListener('wheel', handleScroll);
+      }
+    };
   }, [canvasNode, url]);
+
+  useEffect(() => {
+    
+    if (canvasNode && originImg) {
+      const ctx = canvasNode.getContext('2d');
+      // 清除画布
+      ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
+      
+      // 缩放画布
+      ctx.save();
+      ctx.scale(zoomLevel, zoomLevel);
+
+      // 绘制图像
+      ctx.drawImage(originImg, 0, 0, canvasNode.width, canvasNode.height);
+
+      ctx.restore();
+    }
+    // 添加滚动事件监听
+    if (canvasNode) {
+      canvasNode.addEventListener('wheel', handleScroll);
+    }
+
+    return () => {
+      // 移除滚动事件监听
+      if (canvasNode) {
+        canvasNode.removeEventListener('wheel', handleScroll);
+      }
+    };
+  }, [originImg, zoomLevel, canvasNode]);
+
 
   // 获得裁剪后的图片文件
   const getImgTrimData = () => {
@@ -156,6 +210,7 @@ export default function ({
     }
 
     const ctx = canvasNode.getContext('2d');
+    const trimPadding = 5; // 裁剪框内边距
 
     // 重新构建一个canvas，计算出包含多个裁剪框的最小矩形
     const trimCanvasNode = document.createElement('canvas');
@@ -166,10 +221,15 @@ export default function ({
     trimCtx.clearRect(0, 0, trimCanvasNode.width, trimCanvasNode.height);
     trimPositionMap.map(pos => {
       // 取到裁剪框的像素数据
-      const data = ctx.getImageData(pos.startX, pos.startY, pos.width, pos.height);
+      const data = ctx.getImageData(pos.startX+trimPadding, pos.startY+trimPadding, pos.width-2*trimPadding, pos.height-2*trimPadding);
       // 输出在canvas上
       trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
+      ctx.clearRect(0,0,canvasNode.width,canvasNode.height);
+      setOriginImg(trimCanvasNode);
+      // 刷新ctx
+      ctx.putImageData(data, pos.startX+trimPadding, pos.startY+trimPadding);
       const dataUrl = trimCanvasNode.toDataURL();
+
       const base64Image = trimCanvasNode.toDataURL('image/png'); // 可以根据需要更改图像格式
 
       console.log(base64Image);
@@ -186,19 +246,6 @@ export default function ({
 
     // const trimData = trimCanvasNode.toDataURL();
 
-    // 若转成图片，直接输出trimData；若转成文字，则请求OCR接口,转换成文字
-    // (flag === 'justImg'
-    //   ? Promise.resolve(trimData)
-    //   : dispatch({
-    //       type: 'digital/postImgFileWithAliOcr',
-    //       payload: {
-    //         img: trimData,
-    //       },
-    //     })
-    // ).then(result => {
-    //    // 调用外部api,输出图片数据
-    //   onTransform(result, flag);
-    // });
   };
 
   // 计算出包含多个裁剪框的最小矩形
@@ -285,12 +332,6 @@ export default function ({
 
   return (
     <section ref={setContentNode} className="modaLLayout"  >
-      <canvas
-        ref={setCanvasNode}
-        onMouseDown={handleMouseDownEvent}
-        onMouseMove={handleMouseMoveEvent}
-        onMouseUp={handleMouseRemoveEvent}
-      />
       <div ref={setBtnGroupNode} className="buttonWrap">
         <button
           type="link"
@@ -322,6 +363,13 @@ export default function ({
           转为文字
         </button> */}
       </div>
+      <canvas
+        ref={setCanvasNode}
+        onMouseDown={handleMouseDownEvent}
+        onMouseMove={handleMouseMoveEvent}
+        onMouseUp={handleMouseRemoveEvent}
+      />
+      
     </section>
   )
 }

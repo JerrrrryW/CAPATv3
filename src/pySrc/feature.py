@@ -6,7 +6,6 @@ import time
 from HOG import *
 from sklearn.cluster import KMeans
 from PIL import Image
-from PyQt5.QtGui import QPixmap
 from pywt import dwt2, idwt2
 from matplotlib import font_manager
 import os

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import AttriCard from './AttriCard';
 import './AlgorithmView.css';
 import axios from 'axios';
-import HttpUtil from '../utils/HttpUtil';
-
 function AlgorithmView({ 
   inputArray ,
   imgSrc,
@@ -11,7 +9,6 @@ function AlgorithmView({
   const [buttonColumns, setButtonColumns] = useState(3); // 初始按钮列数为3
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [highlightedButtonIndex, setHighlightedButtonIndex] = useState(null);
-  const [ imageData, setImageData ] = useState(null); // 用于存储从后端传来的数据
 
   const attris = [
     { name: "参数1", min: 0, max: 100 , value: 50},
@@ -47,18 +44,7 @@ function AlgorithmView({
 
   const handleButtonClick = (index) => {
     setHighlightedButtonIndex(index);
-    console.log(index);
-    const dataToSend = { fileName: index };
-
-    // 发送JSON数据到Flask服务器
-    HttpUtil.post_get('http://127.0.0.1:5000/getProceed', dataToSend)
-      .then((data) => {
-        console.log(data)
-        setImageData(data.img_stream);
-      })
-      .catch(error=>{
-        console.log(error);
-      });
+    //TODO 
   };
 
   useEffect(() => {
@@ -92,8 +78,7 @@ function AlgorithmView({
               margin: '5px',
               // backgroundColor: highlightedButtonIndex === index ? 'yellow' : 'initial',
             }}
-            // 设计点击逻辑
-            onClick={() => handleButtonClick(item)}
+            onClick={() => handleButtonClick(index)}
           >
             {item}
           </button>
@@ -102,18 +87,12 @@ function AlgorithmView({
       {/* 中部图片处理结果预览区域 */}
       <div className='image-preview'>
         {/* 添加图片处理结果预览区域的内容 */}
-
-      {imageData && 
-        <img id = "captchaImg"
-          src={`data:image/jpg;base64,${imageData}`} 
-          alt="Image" 
-        />}
-        {/* <img
+        <img
           id = "captchaImg"
           src = {imgSrc}
           alt = '点击刷新'
           onClick={getData}
-			  /> */}
+			  />
       </div>
 
       {/* 下方参数调整窗口卡片 */}

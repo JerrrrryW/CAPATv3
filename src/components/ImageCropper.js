@@ -1,4 +1,3 @@
-import HttpUtil from '../utils/HttpUtil';
 import React, { useState, useEffect, useRef } from 'react';
 // import { useSelector, useDispatch } from 'react-redux';
 
@@ -230,12 +229,6 @@ export default function ({
       ctx.putImageData(data, pos.startX+trimPadding, pos.startY+trimPadding);
       const dataUrl = trimCanvasNode.toDataURL();
 
-      const base64Image = trimCanvasNode.toDataURL('image/png'); // 可以根据需要更改图像格式
-
-      console.log(base64Image);
-
-      const dataz = {image: base64Image};
-      HttpUtil.postImg('http://127.0.0.1:5000/getFragment', dataz);
       // 向父节点传递历史切片信息
       setHistoricalImages(prevState => [...prevState, dataUrl]);
       return null;

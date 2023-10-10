@@ -46,6 +46,7 @@ function App() {
             <ImageCropper 
               file={{ url: imageSrc }} 
               setHistoricalImages={setHistoricalImages}
+              contentRef={cropperParentRef}
             />
           </div>
           <div id='history-container'>

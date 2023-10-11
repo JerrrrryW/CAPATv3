@@ -4,6 +4,7 @@
     padding: 10px;
     text-align: left;
     display:flex;
+    align-items: center;
 
     #toolbar-left {
         flex:1;
@@ -19,4 +20,31 @@
       font-weight: bold;
       font-size: 20px;
     }
+}
+
+.file {
+  position: relative;
+  display: inline-block;
+  background: #ffe9d0;
+  border: 2px solid #f59999;
+  border-radius: 5px;
+  padding: 5px 20px;
+  overflow: hidden;
+  color: #c7541e;
+  text-decoration: none;
+  text-indent: 0;
+}
+.file input {
+  position: absolute;
+  font-size: 100px;
+  right: 0;
+  top: 0;
+  opacity: 0;
+}
+.file:hover {
+  background: #f3cea3;
+  border-color: #f59999;
+  color: #c7541e;
+  font-weight: bold;
+  text-decoration: none;
 }

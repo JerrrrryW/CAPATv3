@@ -27,6 +27,7 @@ export default function ({
   const [imgOffset, setImgOffset] = useState([0, 0]);
   const [imgScale, setImgScale] = useState([10, 10]);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isCropping, setIsCropping] = useState(false); // 是否正在裁剪
 
 
   // 初始化
@@ -48,39 +49,6 @@ export default function ({
     setOriginImg(image); // 保存源图
     image.addEventListener('load', () => {
       const ctx = canvasNode.getContext('2d');
-
-      // 若源图宽度大于最外层节点的clientWidth，则设置canvas宽为clientWidth，否则设置为图片的宽度
-      // const clientW = contentNode.clientWidth;
-      // const size = image.width / clientW;
-      // // 设置最大高度，比如500像素
-      // const maxHeight = parentHeight;
-
-      // let canvasWidth, canvasHeight;
-
-      // if (image.width > clientW) {
-      //   canvasWidth = clientW;
-      //   canvasHeight = image.height / size;
-
-      //   // 如果高度超过最大高度，重新计算宽度和高度
-      //   if (canvasHeight > maxHeight) {
-      //     const ratio = maxHeight / canvasHeight;
-      //     canvasHeight = maxHeight;
-      //     canvasWidth *= ratio;
-      //   }
-      // } else {
-      //   canvasWidth = image.width;
-      //   canvasHeight = image.height;
-
-      //   // 如果高度超过最大高度，重新计算宽度和高度
-      //   if (canvasHeight > maxHeight) {
-      //     const ratio = maxHeight / canvasHeight;
-      //     canvasHeight = maxHeight;
-      //     canvasWidth *= ratio;
-      //   }
-      // }
-
-      // canvasNode.width = canvasWidth;
-      // canvasNode.height = canvasHeight;
 
       canvasNode.width = contentNode.clientWidth;
       canvasNode.height = parentHeight;
@@ -193,11 +161,11 @@ export default function ({
 
   useEffect(() => {
     initCanvas();
+
     // 添加滚动事件监听
     if (canvasNode) {
       canvasNode.addEventListener('wheel', handleScroll);
     }
-
     return () => {
       // 移除滚动事件监听
       if (canvasNode) {
@@ -212,30 +180,37 @@ export default function ({
       const ctx = canvasNode.getContext('2d');
       // 清除画布
       ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
-  
+
       // 计算鼠标相对于canvas的位置
       const canvasRect = canvasNode.getBoundingClientRect();
       const mouseX = mousePosition.x - canvasRect.left;
       const mouseY = mousePosition.y - canvasRect.top;
-  
+
       // 缩放画布以鼠标位置为中心
       ctx.save();
       ctx.translate(mouseX, mouseY);
       ctx.scale(zoomLevel, zoomLevel);
       ctx.translate(-mouseX, -mouseY);
-  
+
       // 绘制图像
       ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
-      console.log("scrolling:",imgOffset, imgScale)
-  
+      setImgOffset([
+        imgOffset[0] * zoomLevel + (1 - zoomLevel) * mouseX,
+        imgOffset[1] * zoomLevel + (1 - zoomLevel) * mouseY]
+      )
+      setImgScale([imgScale[0] * zoomLevel, imgScale[1] * zoomLevel])
+
+
+      console.log("scrolling:", imgOffset, imgScale)
+
       ctx.restore();
     }
-  
+
     // 添加滚动事件监听
     if (canvasNode) {
       canvasNode.addEventListener('wheel', handleScroll);
     }
-  
+
     return () => {
       // 移除滚动事件监听
       if (canvasNode) {
@@ -266,13 +241,13 @@ export default function ({
     trimPositionMap.map(pos => {
       // 取到裁剪框的像素数据
       // console.log("trim pos:", pos);
-      const data = ctx.getImageData(pos.startX + trimPadding, pos.startY + trimPadding , pos.width - 2 * trimPadding, pos.height - 2 * trimPadding );
+      const data = ctx.getImageData(pos.startX + trimPadding, pos.startY + trimPadding, pos.width - 2 * trimPadding, pos.height - 2 * trimPadding);
       // 输出在canvas上
       trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
       ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
-      setOriginImg(trimCanvasNode);
+      // setOriginImg(trimCanvasNode);
       // 刷新ctx
-      ctx.putImageData(data, pos.startX + trimPadding, pos.startY + trimPadding);
+      ctx.putImageData(data, pos.startX + trimPadding, pos.startY + trimPadding, pos.startX - startX, pos.startY - startY, pos.width - 2 * trimPadding, pos.height - 2 * trimPadding);
       const dataUrl = trimCanvasNode.toDataURL();
 
       // 向父节点传递历史切片信息
@@ -348,7 +323,7 @@ export default function ({
     // 再次调用drawImage将图片绘制到蒙层下方
     ctx.save();
     ctx.globalCompositeOperation = 'destination-over';
-    console.log("dragging:", imgOffset, imgScale)
+    // console.log("dragging:", imgOffset, imgScale)
     ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
     ctx.restore();
   };
@@ -369,6 +344,10 @@ export default function ({
     ctx.fillRect(x + w - size / 2, y + h / 2 - size / 2, size, size);
   };
 
+  const handleToolSwitch = () => {
+    setIsCropping(!isCropping);
+  };
+
   return (
     <section ref={setContentNode} className="modaLLayout"  >
       <div ref={setBtnGroupNode} className="buttonWrap">
@@ -376,26 +355,31 @@ export default function ({
           type="link"
           icon="close"
           size="small"
-          ghost
-        // disabled={fileSyncUpdating} 
+          onClick={() => {initCanvas();}}
         >
-          取消
+          重置
         </button>
+
+        <button
+          onMouseDown={handleToolSwitch}
+          className={`button ${isCropping ? 'active' : ''}`}
+        >
+          裁切
+        </button>
+
         <button
           type="link"
           icon="file-image"
           size="small"
-          ghost
           // disabled={fileSyncUpdating}
           onClick={getImgTrimData}
         >
-          转为图片
+          确认
         </button>
         {/* <button
           type="link"
           icon="file-text"
           size="small"
-          ghost
           // loading={fileSyncUpdating}
           onClick={getImgTrimData}
         >

@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import './App.css';
 import Toolbar from './components/Toolbar.js';
 import ImageCropper from './components/ImageCropper.js';
@@ -34,6 +34,21 @@ function App() {
   const [imageSrc, setImageSrc] = useState('./P330.jpg');
   const cropperParentRef = useRef(null);
 
+  const [windowSize, setWindowsSize] = useState({
+    width: document.documentElement.clientWidth, height: document.documentElement.clientHeight
+  })
+  const onResize = useCallback(() => {
+    setWindowsSize({
+      width: document.documentElement.clientWidth, height: document.documentElement.clientHeight,
+    })
+  }, [])
+  useEffect(() => {
+    window.addEventListener('resize', onResize);
+    return (() => {
+      window.removeEventListener('resize', onResize)
+    })
+  }, [])
+
   return (
     <div className="app-container">
       <Toolbar
@@ -43,10 +58,11 @@ function App() {
         {/* <ImageUploader /> */}
         <div className='left-panel'>
           <div id='image-container' ref={cropperParentRef}>
-            <ImageCropper 
-              file={{ url: imageSrc }} 
+            <ImageCropper
+              file={{ url: imageSrc }}
               setHistoricalImages={setHistoricalImages}
               contentRef={cropperParentRef}
+              parentHeight={windowSize.height*0.70 /* = 70vh */}
             />
           </div>
           <div id='history-container'>

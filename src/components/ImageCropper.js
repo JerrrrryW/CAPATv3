@@ -14,12 +14,13 @@ export default function ({
 }) {
   const { url } = file;
   const [originImg, setOriginImg] = useState(); // 源图片
+  const [currentImg, setCurrentImg] = useState(); // 当前图片/裁剪后的图片
   const [contentNode, setContentNode] = useState(); // 最外层节点
   const [canvasNode, setCanvasNode] = useState(); // canvas节点
   const [btnGroupNode, setBtnGroupNode] = useState(); // 按钮组
   const [startCoordinate, setStartCoordinate] = useState([0, 0]); // 开始坐标
   const [dragging, setDragging] = useState(false); // 是否可以裁剪
-  const [curPoisition, setCurPoisition] = useState(null); // 当前裁剪框坐标信息
+  const [curPosition, setCurPosition] = useState(null); // 当前裁剪框坐标信息 or 移动距离（取决于isCropping）
   const [trimPositionMap, setTrimPositionMap] = useState([]); // 裁剪框坐标信息
   // const fileSyncUpdating = useSelector(state => state.loading.effects['digital/postImgFileWithAliOcr']);
   // const dispatch = useDispatch();
@@ -47,6 +48,7 @@ export default function ({
 
     const image = new Image();
     setOriginImg(image); // 保存源图
+    setCurrentImg(image); // 初始化时源图即为当前图
     image.addEventListener('load', () => {
       const ctx = canvasNode.getContext('2d');
 
@@ -87,63 +89,92 @@ export default function ({
     image.src = url;
   };
 
+  /*
+   * 裁切或移动图片
+   */
   // 点击鼠标事件
   const handleMouseDownEvent = e => {
-    // 开始裁剪
-    setDragging(true);
-    setTrimPositionMap([]);
-    const { offsetX, offsetY } = e.nativeEvent;
-    // 保存开始坐标
-    setStartCoordinate([offsetX, offsetY]);
+    if (isCropping) {
+      // 开始裁剪
+      setDragging(true);
+      setTrimPositionMap([]);
+      const { offsetX, offsetY } = e.nativeEvent;
+      // 保存开始坐标
+      setStartCoordinate([offsetX, offsetY]);
 
-    if (btnGroupNode == null) {
-      return;
+      if (btnGroupNode == null) {
+        return;
+      }
+    } else {
+      // 开始移动图片
+      const { offsetX, offsetY } = e.nativeEvent;
+      setStartCoordinate({ x: offsetX, y: offsetY });
+      setDragging(true);
     }
-    // 裁剪按钮不可见
-    // btnGroupNode.style.display = 'none';
   };
 
   // 移动鼠标事件
   const handleMouseMoveEvent = e => {
-    const { offsetX, offsetY } = e.nativeEvent;
-    setMousePosition({ x: offsetX, y: offsetY });
+    if (isCropping) {
+      const { offsetX, offsetY } = e.nativeEvent;
+      setMousePosition({ x: offsetX, y: offsetY });
 
-    if (!dragging) {
-      return;
+      if (!dragging) return;
+      const ctx = canvasNode.getContext('2d');
+      // 每一帧都需要清除画布(取最后一帧绘图状态, 否则状态会累加)
+      ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
+
+      // 计算临时裁剪框的宽高
+      const tempWidth = offsetX - startCoordinate[0];
+      const tempHeight = offsetY - startCoordinate[1];
+      // 调用绘制裁剪框的方法
+      drawTrim(startCoordinate[0], startCoordinate[1], tempWidth, tempHeight);
+    } 
+    else {// 移动图片
+      if (!dragging) return;
+
+      const { offsetX, offsetY } = e.nativeEvent;
+      // 计算鼠标移动的距离
+      const dx = offsetX - startCoordinate.x;
+      const dy = offsetY - startCoordinate.y;
+      
+      // console.log("offsetX:", offsetX, "offsetY:", offsetY, "startCoordinate:", startCoordinate, "dx:", dx, "dy:", dy);
+      const ctx = canvasNode.getContext('2d');
+      ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
+      ctx.drawImage(currentImg, imgOffset[0] + dx, imgOffset[1] + dy, imgScale[0], imgScale[1]);
+      setCurPosition({dx: dx, dy: dy})
+      
     }
-    const ctx = canvasNode.getContext('2d');
-    // 每一帧都需要清除画布(取最后一帧绘图状态, 否则状态会累加)
-    ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
-
-    // 计算临时裁剪框的宽高
-    const tempWidth = offsetX - startCoordinate[0];
-    const tempHeight = offsetY - startCoordinate[1];
-    // 调用绘制裁剪框的方法
-    drawTrim(startCoordinate[0], startCoordinate[1], tempWidth, tempHeight);
   };
 
   // 松开鼠标
   const handleMouseRemoveEvent = () => {
-    // 结束裁剪
-    setDragging(false);
+    if (isCropping) {
+      // 结束裁剪
+      setDragging(false);
 
-    // 处理裁剪按钮样式
-    if (curPoisition == null) {
-      return;
+      // 处理裁剪按钮样式
+      if (curPosition == null) {
+        return;
+      }
+      if (btnGroupNode == null) {
+        return;
+      }
+      btnGroupNode.style.display = 'block';
+      btnGroupNode.style.left = `${curPosition.startX}px`;
+      btnGroupNode.style.top = `${curPosition.startY + curPosition.height}px`;
+
+      setTrimPositionMap([curPosition]);
+      // console.log(curPoisition);
+      // console.log(imgOffset)
+
+      // 判断裁剪区是否重叠(此项目需要裁剪不规则的相邻区域，所以裁剪框重叠时才支持批量裁剪)
+      // judgeTrimAreaIsOverlap();
+    } else {
+      // 结束移动图片
+      setDragging(false);
+      setImgOffset([imgOffset[0] + curPosition.dx, imgOffset[1] + curPosition.dy]);
     }
-    if (btnGroupNode == null) {
-      return;
-    }
-    btnGroupNode.style.display = 'block';
-    btnGroupNode.style.left = `${curPoisition.startX}px`;
-    btnGroupNode.style.top = `${curPoisition.startY + curPoisition.height}px`;
-
-    setTrimPositionMap([curPoisition]);
-    console.log(curPoisition);
-    console.log(imgOffset)
-
-    // 判断裁剪区是否重叠(此项目需要裁剪不规则的相邻区域，所以裁剪框重叠时才支持批量裁剪)
-    // judgeTrimAreaIsOverlap();
   };
 
   // 设置鼠标滚动事件
@@ -152,12 +183,12 @@ export default function ({
     event.preventDefault();
     const delta = event.deltaY;
     let newZoomLevel;
-    if (delta > 0){ // 鼠标上滑
+    if (delta > 0) {
       newZoomLevel = zoomLevel > 1 ? 1 : zoomLevel - 0.01;
     } else {
       newZoomLevel = zoomLevel < 1 ? 1 : zoomLevel + 0.01;
     }
-      
+
 
     // 限制缩放范围
     // newZoomLevel = Math.max(0.1, Math.min(3.0, newZoomLevel));
@@ -182,7 +213,7 @@ export default function ({
 
   useEffect(() => {
 
-    if (canvasNode && originImg) {
+    if (canvasNode && currentImg) {
       const ctx = canvasNode.getContext('2d');
       // 清除画布
       ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
@@ -199,19 +230,16 @@ export default function ({
       ctx.translate(-mouseX, -mouseY);
 
       // 绘制图像
-      ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
+      ctx.drawImage(currentImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
+
       setImgOffset(prevImgOffset => [
         (prevImgOffset[0] - mouseX) * zoomLevel + mouseX,
         (prevImgOffset[1] - mouseY) * zoomLevel + mouseY
       ]);
-      
       setImgScale(prevImgScale => [
         prevImgScale[0] * zoomLevel,
         prevImgScale[1] * zoomLevel
       ]);
-      
-      console.log("zoomlever:", zoomLevel)
-      console.log("offset:",imgOffset,"scale:",imgScale)
 
       ctx.restore();
     }
@@ -227,7 +255,7 @@ export default function ({
         canvasNode.removeEventListener('wheel', handleScroll);
       }
     };
-  }, [originImg, zoomLevel, canvasNode]);
+  }, [currentImg, zoomLevel, canvasNode]);
 
 
   // 获得裁剪后的图片文件
@@ -255,10 +283,12 @@ export default function ({
       // 输出在canvas上
       trimCtx.putImageData(data, pos.startX - startX, pos.startY - startY);
       ctx.clearRect(0, 0, canvasNode.width, canvasNode.height);
-      // setOriginImg(trimCanvasNode);
       // 刷新ctx
       ctx.putImageData(data, pos.startX + trimPadding, pos.startY + trimPadding, pos.startX - startX, pos.startY - startY, pos.width - 2 * trimPadding, pos.height - 2 * trimPadding);
       const dataUrl = trimCanvasNode.toDataURL();
+      setCurrentImg(trimCanvasNode)
+      setImgOffset([pos.startX + trimPadding, pos.startY + trimPadding]);
+      setImgScale([pos.width - 2 * trimPadding, pos.height - 2 * trimPadding]);
 
       // 向父节点传递历史切片信息
       setHistoricalImages(prevState => [...prevState, dataUrl]);
@@ -310,7 +340,7 @@ export default function ({
     }
 
     // 保存当前区域坐标信息
-    setCurPoisition({
+    setCurPosition({
       width: w,
       height: h,
       startX: x,
@@ -334,7 +364,7 @@ export default function ({
     ctx.save();
     ctx.globalCompositeOperation = 'destination-over';
     // console.log("dragging:", imgOffset, imgScale)
-    ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
+    ctx.drawImage(currentImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
     ctx.restore();
   };
 
@@ -365,7 +395,7 @@ export default function ({
           type="link"
           icon="close"
           size="small"
-          onClick={() => {initCanvas();}}
+          onClick={() => { initCanvas(); }}
         >
           重置
         </button>

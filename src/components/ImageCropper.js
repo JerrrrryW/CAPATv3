@@ -151,10 +151,16 @@ export default function ({
   const handleScroll = (event) => {
     event.preventDefault();
     const delta = event.deltaY;
-    let newZoomLevel = zoomLevel + (delta > 0 ? -0.1 : 0.1);
+    let newZoomLevel;
+    if (delta > 0){ // 鼠标上滑
+      newZoomLevel = zoomLevel > 1 ? 1 : zoomLevel - 0.01;
+    } else {
+      newZoomLevel = zoomLevel < 1 ? 1 : zoomLevel + 0.01;
+    }
+      
 
     // 限制缩放范围
-    newZoomLevel = Math.max(0.1, Math.min(3.0, newZoomLevel));
+    // newZoomLevel = Math.max(0.1, Math.min(3.0, newZoomLevel));
 
     setZoomLevel(newZoomLevel);
   };
@@ -194,14 +200,18 @@ export default function ({
 
       // 绘制图像
       ctx.drawImage(originImg, imgOffset[0], imgOffset[1], imgScale[0], imgScale[1]);
-      setImgOffset([
-        imgOffset[0] * zoomLevel + (1 - zoomLevel) * mouseX,
-        imgOffset[1] * zoomLevel + (1 - zoomLevel) * mouseY]
-      )
-      setImgScale([imgScale[0] * zoomLevel, imgScale[1] * zoomLevel])
-
-
-      console.log("scrolling:", imgOffset, imgScale)
+      setImgOffset(prevImgOffset => [
+        (prevImgOffset[0] - mouseX) * zoomLevel + mouseX,
+        (prevImgOffset[1] - mouseY) * zoomLevel + mouseY
+      ]);
+      
+      setImgScale(prevImgScale => [
+        prevImgScale[0] * zoomLevel,
+        prevImgScale[1] * zoomLevel
+      ]);
+      
+      console.log("zoomlever:", zoomLevel)
+      console.log("offset:",imgOffset,"scale:",imgScale)
 
       ctx.restore();
     }

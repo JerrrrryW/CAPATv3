@@ -20,7 +20,7 @@ function Toolbar({
   return (
     <div className="toolbar">
       <div id="toolbar-left">
-        <a class="file">选择文件
+        <a className="file">选择文件
           <input type="file" accept="image/*" onChange={handleImageChange} />
         </a>
       </div>

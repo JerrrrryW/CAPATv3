@@ -292,7 +292,7 @@ export default function ({
 
       // 向父节点传递历史切片信息
       setHistoricalImages(prevState => [...prevState, dataUrl]);
-      return null;
+      return setIsCropping(false);
     });
 
     // 将裁剪后的图片显示在页面上（仅供测试使用）
@@ -393,11 +393,17 @@ export default function ({
       <div ref={setBtnGroupNode} className="buttonWrap">
         <button
           type="link"
-          icon="close"
           size="small"
-          onClick={() => { initCanvas(); }}
+          onClick={initCanvas}
         >
-          重置
+          <img src='/icon/reset.svg' alt='重置' style={
+            {
+              width: '20px',
+              height: '20px',
+              marginLeft: '5px',
+              verticalAlign: 'middle'
+            }
+          }/>
         </button>
 
         <button

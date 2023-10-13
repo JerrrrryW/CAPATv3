@@ -10,7 +10,7 @@ export default function ({
   file,
   parentHeight = 600,
   setHistoricalImages,
-  contentRef,
+  setImageSrc,
 }) {
   const { url } = file;
   const [originImg, setOriginImg] = useState(); // 源图片
@@ -174,6 +174,7 @@ export default function ({
       // 结束移动图片
       setDragging(false);
       setImgOffset([imgOffset[0] + curPosition.dx, imgOffset[1] + curPosition.dy]);
+      console.log("new imgOffset:", imgOffset);
     }
   };
 
@@ -188,7 +189,7 @@ export default function ({
     } else {
       newZoomLevel = zoomLevel < 1 ? 1 : zoomLevel + 0.01;
     }
-
+    setMousePosition({ x: event.offsetX, y: event.offsetY });
 
     // 限制缩放范围
     // newZoomLevel = Math.max(0.1, Math.min(3.0, newZoomLevel));
@@ -292,6 +293,7 @@ export default function ({
 
       // 向父节点传递历史切片信息
       setHistoricalImages(prevState => [...prevState, dataUrl]);
+      setImageSrc(dataUrl);
       return setIsCropping(false);
     });
 

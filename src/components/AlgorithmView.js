@@ -93,6 +93,12 @@ function AlgorithmView({
           alt = '点击刷新'
           onClick={getData}
 			  />
+        <div class="separator"></div>
+        <img
+          src = {imgSrc}
+          alt = '点击刷新'
+          onClick={getData}
+			  />
       </div>
 
       {/* 下方参数调整窗口卡片 */}

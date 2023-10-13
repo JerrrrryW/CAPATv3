@@ -19,6 +19,7 @@
 .image-preview {
     margin-top: 20px;
     display: grid;
+    grid-template-columns: 1fr auto 1fr;
     place-items: center;
     flex: 1;
 }
@@ -38,3 +39,9 @@
     margin-top: 20px;
     align-items: flex-end;
 }
+.separator {
+    width: 2px; /* Width of the separator */
+    margin: 10px;
+    background-color: #aeaeae; /* Color of the separator */
+    height: 300px; /* Adjust the height of the separator as needed */
+  }

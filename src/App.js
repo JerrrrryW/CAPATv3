@@ -18,7 +18,7 @@ function HistoryCard({
             <img
               src={image}
               alt={`Image ${index}`}
-              
+
               key={index}
               onClick={() => setImageSrc(image)} />
           ))}
@@ -40,6 +40,7 @@ function App() {
     // '/fragments/P330_6.jpeg',
   ]);
   const [imageSrc, setImageSrc] = useState('./P330.jpg');
+  const [fragmentSrc, setFragmentSrc] = useState('./P330_1.png');
   const cropperParentRef = useRef(null);
 
   const [windowSize, setWindowsSize] = useState({
@@ -71,6 +72,7 @@ function App() {
               setHistoricalImages={setHistoricalImages}
               contentRef={cropperParentRef}
               parentHeight={windowSize.height * 0.70 /* = 70vh */}
+              setImageSrc={setFragmentSrc}
             />
           </div>
           <div id='history-container'>
@@ -79,7 +81,7 @@ function App() {
         </div>
         {/* <ImageCropper /> */}
         <div className="right-panel">
-          <TabbedComponent />
+          <TabbedComponent imageSrc={fragmentSrc}/>
         </div>
       </div>
     </div>

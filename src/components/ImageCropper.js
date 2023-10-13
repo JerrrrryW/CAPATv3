@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import HttpUtil from '../utils/HttpUtil';
 // import { useSelector, useDispatch } from 'react-redux';
 
 /**
@@ -287,6 +288,12 @@ export default function ({
       // 刷新ctx
       ctx.putImageData(data, pos.startX + trimPadding, pos.startY + trimPadding, pos.startX - startX, pos.startY - startY, pos.width - 2 * trimPadding, pos.height - 2 * trimPadding);
       const dataUrl = trimCanvasNode.toDataURL();
+      // 将数据传到后端
+      const base64Image = trimCanvasNode.toDataURL('image/png'); // 可以根据需要更改图像格式
+      console.log(base64Image);
+      const dataz = { image: base64Image };
+      HttpUtil.postImg('http://127.0.0.1:5000/getFragment', dataz);
+
       setCurrentImg(trimCanvasNode)
       setImgOffset([pos.startX + trimPadding, pos.startY + trimPadding]);
       setImgScale([pos.width - 2 * trimPadding, pos.height - 2 * trimPadding]);

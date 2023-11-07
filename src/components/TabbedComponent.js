@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './TabbedComponent.css';
 import AlgorithmView from './AlgorithmView';
 
-function TabbedComponent() {
+function TabbedComponent({imageSrc}) {
   const [activeTab, setActiveTab] = useState(1);
   const algorithmList = ['SIFT','HOG','Sobel','Scarr','Gradient','K-means', 'Color Hist'];
 
@@ -33,7 +33,7 @@ function TabbedComponent() {
                 <p>图像处理算法</p>
                 <AlgorithmView 
                   inputArray={algorithmList}
-                  imgSrc={'./P330.jpg'}
+                  imgSrc={imageSrc}
                 />
             </div>
         }

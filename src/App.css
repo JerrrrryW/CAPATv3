@@ -49,20 +49,21 @@ button {
   border-radius: 5px;
 }
 
+button:hover {
+  background-color: #eee;
+  border: chocolate 1x solid;
+  font-weight: bold;
+}
+
 button.active {
   background-color: chocolate;
   color: white;
 }
 
-button:hover {
-  background-color: chocolate;
-  color: white;
-  font-weight: bold;
-}
-
 img {
   max-width: 100%;
   max-height: 100%;
+  object-fit: cover;
 }
 
 canvas {
@@ -80,7 +81,7 @@ canvas {
 
 #image-container {
   flex:1;
-  max-height: 72vh;
+  /* max-height: 72vh; */
 }
 
 #history-container {

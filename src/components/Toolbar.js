@@ -19,14 +19,16 @@ function Toolbar({
 
   return (
     <div className="toolbar">
-      <div id = "toolbar-left">
-        <input type="file" accept="image/*" onChange={handleImageChange}/>
+      <div id="toolbar-left">
+        <a className="file">选择文件
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+        </a>
       </div>
-      <div id = "toolbar-center">
+      <div id="toolbar-center">
         中国传统绘画计算机辅助鉴别系统
       </div>
-      <div id = "toolbar-right">
-        <button>切片</button>
+      <div id="toolbar-right">
+
       </div>
 
     </div>

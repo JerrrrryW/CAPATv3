@@ -49,7 +49,7 @@ export default class HttpUtil{
                 .then(result=>resolve(result))
                 .catch(error=>{
                     console.log(error);
-                    // reject(error);
+                    reject(error);
                 })
         })
     }

@@ -15,12 +15,11 @@
   background-color: #f2ece5;
   padding: 10px;
   display: flex;
-  flex-direction: column;
   max-width: 70%;
 }
 
 .right-panel {
-  flex: 1; /* 占据窗口宽度的1/3 */
+  flex: 3; /* 占据窗口宽度的1/3 */
   background-color: #d7cfc5;
   padding: 10px;
 }

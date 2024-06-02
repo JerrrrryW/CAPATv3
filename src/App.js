@@ -4,6 +4,7 @@ import './App.css';
 import Toolbar from './components/Toolbar.js';
 import ImageCropper from './components/ImageCropper.js';
 import TabbedComponent from './components/TabbedComponent.js';
+import TimelineChart from './charts/TimelineChart.js';
 
 function HistoryCard({
   images,
@@ -81,7 +82,8 @@ function App() {
         </div>
         {/* <ImageCropper /> */}
         <div className="right-panel">
-          <TabbedComponent imageSrc={fragmentSrc}/>
+          <TimelineChart />
+          <TabbedComponent imageSrc={fragmentSrc}/> 
         </div>
       </div>
     </div>

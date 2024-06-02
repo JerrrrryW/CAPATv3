@@ -17,7 +17,10 @@ function AlgorithmView({
 
   const attris = [
     { name: "参数1", min: 0, max: 100 , value: 50},
-    { name: "参数2", min: 0, max: 50 , value: 25},
+    { name: "参数2", min: 0, max: 70 , value: 25},
+    { name: "参数3", min: 0, max: 50 , value: 10},
+    { name: "参数4", min: 0, max: 30 , value: 17},
+
     // 添加更多参数
   ];
 
@@ -87,7 +90,7 @@ function AlgorithmView({
           src = {imgSrc}
           alt = '点击刷新'
 			  />
-        <div class="separator"></div>
+        <div className="separator"></div>
         {imageData && 
         <img id = "captchaImg"
           src={`data:image/jpg;base64,${imageData}`} 

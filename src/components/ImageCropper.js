@@ -4,6 +4,7 @@ import HttpUtil from '../utils/HttpUtil';
 
 /**
 *file 版面文件
+*@wrhssb
 *useOcr true:通过OCR转换成文字；false:转换为图片
 *onTransform 转换成文字或图片后调用组件外部方法
 */
@@ -274,8 +275,8 @@ export default function ({
     // 重新构建一个canvas，计算出包含多个裁剪框的最小矩形
     const trimCanvasNode = document.createElement('canvas');
     const { startX, startY, minWidth, minHeight } = getMinTrimReactArea();
-    trimCanvasNode.width = minWidth;
-    trimCanvasNode.height = minHeight;
+    trimCanvasNode.width = minWidth - 2 * trimPadding;
+    trimCanvasNode.height = minHeight - 2 * trimPadding;
     const trimCtx = trimCanvasNode.getContext('2d');
     trimCtx.clearRect(0, 0, trimCanvasNode.width, trimCanvasNode.height);
     trimPositionMap.map(pos => {
@@ -290,7 +291,7 @@ export default function ({
       const dataUrl = trimCanvasNode.toDataURL();
       // 将数据传到后端
       const base64Image = trimCanvasNode.toDataURL('image/png'); // 可以根据需要更改图像格式
-      console.log(base64Image);
+      // console.log(base64Image);
       const dataz = { image: base64Image };
       HttpUtil.postImg('http://127.0.0.1:5000/getFragment', dataz);
 
@@ -392,6 +393,8 @@ export default function ({
     ctx.fillRect(x - size / 2, y + h / 2 - size / 2, size, size);
     ctx.fillRect(x + w - size / 2, y + h / 2 - size / 2, size, size);
   };
+
+  
 
   const handleToolSwitch = () => {
     setIsCropping(!isCropping);
